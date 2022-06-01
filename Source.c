@@ -13,24 +13,23 @@
 //e)Sa se citeasca din fisier cel putin 8 elemente de tip struct (pe care l - ati ales)
 
 
+//liniile de metrou din Anglia 
 typedef struct Tranzit Tranzit;
 typedef struct NodPrincipal NodPrincipal;
 typedef struct NodSecundar NodSecundar;
 
-enum ORASE {
-	LONDON, LIVERPOOL, TYNE_WEAR, GLASGLOW
+enum TIP {
+	DT, SS
 };
 
 struct Tranzit {
 	int id; //idul nodului
+	enum TIP tip;
 	float lungime;
-	int linii;
-	char* denumireT;
-	enum ORASE oras; //unde se afla sisteme alea 
-	long voltage;
-	int dim; //dim vectorului de mai jos
-	int* nrTrenuri; //nr de trenuri care circula prin fiecare statie
-	//ex in londra sunt n linii, iar pe fiecare linie merg m trenuri
+	int nrStatii; //dim vectorului de mai jos
+	int* anDStatii; //anii in care s a deschis fiecare statie
+	char* denumire; //culoarea pe care o are pe harta
+	long nrMedCalatori; //nr mediu de calatori de sapt
 };
 
 struct NodPrincipal {
@@ -45,31 +44,30 @@ struct NodSecundar {
 };
 
 Tranzit creareTransit(
-	float lungime,
-	int linii,
 	int id,
-	const char* denumireT,
-	enum ORASE oras,
-	long voltage,
-	int dim,
-	int* nrTrenuri)
+	enum TIP tip,
+	float lungime,
+	int nrStatii,
+	int* anDStatii,
+	const char* denumire,
+	long nrMedCalatori
+)
 {
 	Tranzit t;
-
-	t.lungime = lungime;
-	t.linii = linii;
 	t.id = id;
-	t.denumireT = (char*)malloc(strlen(denumireT) + 1);
-	strcpy(t.denumireT, denumireT);
-	t.oras = oras;
-	t.voltage = voltage;
-
-	t.dim = dim;
-
-	t.nrTrenuri = (int*)malloc(sizeof(nrTrenuri) * dim);
-	for (int i = 0; i < dim; i++) {
-		t.nrTrenuri[i] = nrTrenuri[i];
+	t.tip = tip;
+	t.lungime = lungime;
+	t.nrStatii = nrStatii;
+	t.anDStatii = (int*)malloc(sizeof(anDStatii) * nrStatii);
+	for (int i = 0; i < nrStatii; i++) {
+		t.anDStatii[i] = anDStatii[i];
 	}
+
+
+	t.denumire = (char*)malloc(strlen(denumire) + 1);
+	strcpy(t.denumire, denumire);
+	
+	t.nrMedCalatori = nrMedCalatori;
 
 
 	return t;
@@ -109,20 +107,41 @@ void inserareListaSecundara(NodSecundar** cap, NodPrincipal* infoT) {
 	}
 }
 
-const char* getOrasNume(enum ORASE oras) {
-	switch (oras)
+const char* getStatieNume(enum Linii linie) {
+	switch (linie)
 	{
-	case LONDON:
-		return "London";
+	case BL:
+		return "Bakerloo line";
 		break;
-	case LIVERPOOL:
-		return "Liverpool";
+	case CL:
+		return "Central line";
 		break;
-	case TYNE_WEAR:
-		return "Tyne and Wear";
+	case CIL:
+		return "Circus line";
 		break;
-	case GLASGLOW:
-		return "Glasglow";
+	case DL:
+		return "District line";
+		break;
+	case HCL:
+		return "Hammersmith & City line";
+		break;
+	case JL:
+		return "Jubilee line";
+		break;
+	case ML:
+		return "Metropolitan line";
+		break;
+	case NL:
+		return "Northern line";
+		break;
+	case PL:
+		return "Piccadily line";
+		break;
+	case VL:
+		return "Victoria line";
+		break;
+	case WCL:
+		return "Waterloo & City line";
 		break;
 	default:
 		break;
@@ -131,10 +150,10 @@ const char* getOrasNume(enum ORASE oras) {
 
 
 void afisareTranzit(Tranzit t) {
-	printf("id nod: %d\nlungime: %.2f\nnumar de linii: %d\nnume tranzit: %s\noras: %s\nvoltage: %ld\nnr de trenuri pe fiecare linie: ",
-		t.id, t.lungime, t.linii, t.denumireT, getOrasNume(t.oras), t.voltage);
-	for (int i = 0; i < t.dim; i++) {
-		printf("%d ", t.nrTrenuri[i]);
+	printf("id nod: %d\ntipul de linie: %s\nlungime: %.2f km\nnumele statiei: %s\nnumar mediu de calatori pe saptamana: %d\nnumar de statii: %d\nanii in care a fost inaugurata fiecare statie: ",
+		t.id, getStatieNume(t.tip), t.lungime, t.denumire,t.nrMedCalatori,t.nrStatii);
+	for (int i = 0; i < t.nrStatii; i++) {
+		printf("%d ", t.anDStatii[i]);
 	}
 	printf("\n");
 }
@@ -173,9 +192,8 @@ void main() {
 	NodPrincipal* cap = NULL;
 	int* nrTrenuri[5] = { 7,8,7,7,7 };
 
+	inserareListaPrincipala(&cap, creareTransit(1,0,));
 	inserareListaPrincipala(&cap, creareTransit(402, 11, 1, "London Underground", 0, 630, 5, nrTrenuri));
-	inserareListaPrincipala(&cap, creareTransit(34, 7, 2, "Dockland Light Railway", 0, 750, 5, nrTrenuri));
-	inserareListaPrincipala(&cap, creareTransit(121, 2, 3, "Merseyrail", 1, 750, 5, nrTrenuri));
 	inserareVecini(cap, 1, 2);
 	inserareVecini(cap, 1, 3);
 
