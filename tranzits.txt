@@ -20,7 +20,17 @@ Bakerloo line
 1959
 Central line
 4021135
-
+3
+1
+630.21
+5
+1999
+1989
+1979
+1969
+1959
+Jubilee line
+4021135
 
 
 

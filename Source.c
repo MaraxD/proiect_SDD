@@ -7,17 +7,19 @@
 //Sa se defineasca propria structura(alta decat cele utilizate la seminar) care sa contina :
 // 
 //Pornind de la exemplele de la seminar sa se defineasca si sa se testeze urmatoarele functii :
-//a)Stergerea si dezalocarea unui nod dupa id dintr - un graf;
+//a)Stergerea si dezalocarea unui nod dupa id dintr - un graf; 
 //b)Stergerea si dezalocarea grafului(toate nodurile);
 //c)Stergerea unui nod din arbore dupa id;
 //d)Stergere nod dupa un camp de tip char* dintr - o lista dubla;
-//e)Sa se citeasca din fisier cel putin 8 elemente de tip struct (pe care l - ati ales)
+//e)Sa se citeasca din fisier cel putin 8 elemente de tip struct (pe care l - ati ales) DONE
 
 
 //liniile de metrou din Anglia 
 typedef struct Tranzit Tranzit;
 typedef struct NodPrincipal NodPrincipal;
 typedef struct NodSecundar NodSecundar;
+typedef struct Nod Nod;
+typedef struct ListaD ListaD;
 
 enum TIP {
 	DT, SS
@@ -44,6 +46,17 @@ struct NodSecundar {
 	NodSecundar* next;
 };
 
+struct Nod {
+	Tranzit info;
+	Nod* next;
+	Nod* prev;
+};
+
+struct ListaD {
+	Nod* ultim;
+	Nod* prim;
+};
+
 Tranzit creareTransit(FILE* file)
 {
 
@@ -60,7 +73,7 @@ Tranzit creareTransit(FILE* file)
 		fgets(aux, 10, file);
 		t.nrStatii = atoi(aux);
 
-		t.anDStatii = (int*)malloc(sizeof(t.anDStatii)*t.nrStatii);
+		t.anDStatii = (int*)malloc(sizeof(t.anDStatii) * t.nrStatii);
 		for (int i = 0; i < t.nrStatii; i++)
 		{
 			fgets(aux, 10, file);
@@ -126,7 +139,7 @@ const char* getStatieNume(enum TIP tip) {
 	default:
 		break;
 	}
-	
+
 }
 
 
@@ -169,15 +182,120 @@ void inserareVecini(NodPrincipal* nod, int id1, int id2) {
 	}
 }
 
+void stergereID(NodPrincipal** nod, int id) {
+	//stergem legaturile vecinilor nodului pe care vrem sa l stergem
+	NodPrincipal* aux1 = (*nod);
+	NodSecundar* aux2 = (*nod)->vecini;
+	while (aux1) {
+		if (aux1->info.id == id) {
+			aux1->next = NULL;
+			//dar vreau sa sterg legatura si cu primul lui vecin
+			aux1->vecini->next = NULL;
+
+		}
+		else {
+			//daca se afla printre vecini
+			while (aux2) {
+				if (aux2->info->info.id == id) {
+					aux2->next = NULL;
+				}
+				aux2 = aux2->next;
+			}
+		}
+
+		aux1 = aux1->next;
+	}
+
+	free(cautareNod(nod, id));
+
+
+
+}
+
+
+//functiile pentru lista dubla
+//inserare la inceput
+void inserareListaD(ListaD* cap, Tranzit tr) {
+	Nod* nou = (Nod*)malloc(sizeof(Nod));
+	nou->next = cap->prim;
+	nou->prev = NULL;
+	nou->info = tr;
+	if (cap->prim) {
+		cap->prim->prev = nou;
+		cap->prim = nou; //capul listei noi devin fix ce am adaugat
+	}
+	else {
+		cap->prim = cap->ultim = nou;
+	}
+}
+
+//fac de la stanga la dr
+void afisareLD(ListaD ld) {
+	while (ld.prim) {
+		afisareTranzit(ld.prim->info);
+		ld.prim = ld.prim->next;
+	}
+}
+
+//d)Stergere nod dupa un camp de tip char* dintr - o lista dubla;
+void stergereNod(ListaD* cap, char* denumire) {
+	Nod* aux = cap->prim;
+	Nod* aux2 = cap->ultim;
+	if (strcmp(aux->info.denumire, denumire)) { //daca intra inseamna ca exista si primul cap/ultimul cap
+		aux = aux->next;
+		aux->prev = NULL;
+		free(aux);
+	}
+	else if (strcmp(aux2->info.denumire, denumire)) {
+		aux2 = aux2->prev;
+		aux2->next = NULL;
+		free(aux2);
+	}
+	else {
+		while (aux->next) {
+			if (strcmp(aux->info.denumire, denumire)) {
+				aux = aux->next;
+				aux->prev = aux->prev->prev;
+				free(aux);
+			}
+			else {
+				aux = aux->next;
+			}
+
+		}
+	}
+	
+}
+
+
+
+
 void main() {
 	NodPrincipal* cap = NULL;
+	ListaD listad;
+	listad.prim = NULL;
+	listad.ultim = NULL;
 
 	FILE* f = NULL;
 	f = fopen("tranzits.txt", "r");
-	inserareListaPrincipala(&cap, creareTransit(f));
-	inserareListaPrincipala(&cap, creareTransit(f));
 
-	afisareLista(cap);
+	//arbore
+	/*inserareListaPrincipala(&cap, creareTransit(f));
+	inserareListaPrincipala(&cap, creareTransit(f));
+	afisareLista(cap);*/
+
+	//lista dubla
+	inserareListaD(&listad, creareTransit(f));
+	inserareListaD(&listad, creareTransit(f));
+	inserareListaD(&listad, creareTransit(f));
+
+	afisareLD(listad);
+	stergereNod(&listad, "Jubilee line");
+	printf("\n\n");
+	afisareLD(listad);
+
+
+
 }
 
 
