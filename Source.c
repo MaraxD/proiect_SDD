@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include<malloc.h>
 #include<stdio.h>
+#include<stdlib.h> //pt atof
 #include<string.h>
 
 //Sa se defineasca propria structura(alta decat cele utilizate la seminar) care sa contina :
@@ -43,34 +44,40 @@ struct NodSecundar {
 	NodSecundar* next;
 };
 
-Tranzit creareTransit(
-	int id,
-	enum TIP tip,
-	float lungime,
-	int nrStatii,
-	int* anDStatii,
-	const char* denumire,
-	long nrMedCalatori
-)
+Tranzit creareTransit(FILE* file)
 {
-	Tranzit t;
-	t.id = id;
-	t.tip = tip;
-	t.lungime = lungime;
-	t.nrStatii = nrStatii;
-	t.anDStatii = (int*)malloc(sizeof(anDStatii) * nrStatii);
-	for (int i = 0; i < nrStatii; i++) {
-		t.anDStatii[i] = anDStatii[i];
+
+	if (file != NULL) {
+		Tranzit t;
+		char aux[100];
+		fgets(aux, 10, file);
+		t.id = atoi(aux);
+		fgets(aux, 10, file);
+		t.tip = atoi(aux);
+		fgets(aux, 10, file);
+		t.lungime = atof(aux);
+
+		fgets(aux, 10, file);
+		t.nrStatii = atoi(aux);
+
+		t.anDStatii = (int*)malloc(sizeof(t.anDStatii)*t.nrStatii);
+		for (int i = 0; i < t.nrStatii; i++)
+		{
+			fgets(aux, 10, file);
+			t.anDStatii[i] = atoi(aux);
+		}
+
+		fgets(aux, 50, file);
+		char* sir = strtok(aux, "\n");
+		t.denumire = (char*)malloc(strlen(sir) + 1);
+		strcpy(t.denumire, sir);
+
+		fgets(aux, 10, file);
+		t.nrMedCalatori = atol(aux); //la long??
+
+		return t;
 	}
 
-
-	t.denumire = (char*)malloc(strlen(denumire) + 1);
-	strcpy(t.denumire, denumire);
-	
-	t.nrMedCalatori = nrMedCalatori;
-
-
-	return t;
 }
 
 void inserareListaPrincipala(NodPrincipal** cap, Tranzit tr) {
@@ -107,51 +114,25 @@ void inserareListaSecundara(NodSecundar** cap, NodPrincipal* infoT) {
 	}
 }
 
-const char* getStatieNume(enum Linii linie) {
-	switch (linie)
+const char* getStatieNume(enum TIP tip) {
+	switch (tip)
 	{
-	case BL:
-		return "Bakerloo line";
+	case DT:
+		return "Deep tube";
 		break;
-	case CL:
-		return "Central line";
-		break;
-	case CIL:
-		return "Circus line";
-		break;
-	case DL:
-		return "District line";
-		break;
-	case HCL:
-		return "Hammersmith & City line";
-		break;
-	case JL:
-		return "Jubilee line";
-		break;
-	case ML:
-		return "Metropolitan line";
-		break;
-	case NL:
-		return "Northern line";
-		break;
-	case PL:
-		return "Piccadily line";
-		break;
-	case VL:
-		return "Victoria line";
-		break;
-	case WCL:
-		return "Waterloo & City line";
+	case SS:
+		return "Sub surface";
 		break;
 	default:
 		break;
 	}
+	
 }
 
 
 void afisareTranzit(Tranzit t) {
 	printf("id nod: %d\ntipul de linie: %s\nlungime: %.2f km\nnumele statiei: %s\nnumar mediu de calatori pe saptamana: %d\nnumar de statii: %d\nanii in care a fost inaugurata fiecare statie: ",
-		t.id, getStatieNume(t.tip), t.lungime, t.denumire,t.nrMedCalatori,t.nrStatii);
+		t.id, getStatieNume(t.tip), t.lungime, t.denumire, t.nrMedCalatori, t.nrStatii);
 	for (int i = 0; i < t.nrStatii; i++) {
 		printf("%d ", t.anDStatii[i]);
 	}
@@ -190,12 +171,11 @@ void inserareVecini(NodPrincipal* nod, int id1, int id2) {
 
 void main() {
 	NodPrincipal* cap = NULL;
-	int* nrTrenuri[5] = { 7,8,7,7,7 };
 
-	inserareListaPrincipala(&cap, creareTransit(1,0,));
-	inserareListaPrincipala(&cap, creareTransit(402, 11, 1, "London Underground", 0, 630, 5, nrTrenuri));
-	inserareVecini(cap, 1, 2);
-	inserareVecini(cap, 1, 3);
+	FILE* f = NULL;
+	f = fopen("tranzits.txt", "r");
+	inserareListaPrincipala(&cap, creareTransit(f));
+	inserareListaPrincipala(&cap, creareTransit(f));
 
 	afisareLista(cap);
 }
