@@ -207,17 +207,14 @@ Tranzit creareDefault() {
 void stergereID(NodPrincipal** nod, int id) {
 	NodPrincipal* aux = (*nod);
 	NodPrincipal* n = aux;
-	if (aux->info.id == id) {
-		aux = aux->next;
-
+	if ((*nod)->info.id == id) {
+		(*nod) = (*nod)->next;
 		free(n->info.denumire);
 		free(n);
-		n = NULL;
 	}
 	else {
-		stergereID((*nod)->next, id);
+		stergereID(&(*nod)->next, id);
 	}
-	(*nod) = aux;
 }
 
 //b)Stergerea si dezalocarea grafului(toate nodurile);
@@ -396,29 +393,36 @@ void stergereNod(ListaD* cap, char* denumire) {
 	if (cap->prim || cap->ultim) {
 		if (strcmp(cap->prim->info.denumire, denumire) == 0) { //daca intra inseamna ca exista si primul cap/ultimul cap
 			cap->prim = aux->next; //urmatorul nod de dupa nodul sters va deveni noul cap
+			cap->prim->prev = NULL;
 			free(aux->info.denumire); //stergi capul (unde se afla elem cautat)
 			free(aux);
 		}
 		//daca se afla la sfarsit
 		else if (strcmp(cap->ultim->info.denumire, denumire) == 0) {
 			cap->ultim = aux2->prev;
+			cap->ultim->next = NULL;
 			free(aux2->info.denumire); //stergi capul (unde se afla elem cautat)
 			free(aux2);
+
 		}
 		//daca se afla in interior (fac parcurgere de la stg la dr)
 		else {
 			aux = aux->next;
-			/*while (aux->next) {*/
-			if (strcmp(aux->info.denumire, denumire) == 0) {
-				aux->prev->next = aux->next;
-				free(aux->info.denumire);
-				free(aux);
-			}/*
-			else {
-				aux = aux->next;
-			}*/
+			while (aux->next) {
+				if (strcmp(aux->info.denumire, denumire) == 0) {
+					aux->prev->next = aux->next;
+					aux->next->prev = aux->prev;
+					aux->next = NULL;
+					//aux->prev->next = aux->next;
+					free(aux->info.denumire);
+					free(aux->info.anDStatii);
+					free(aux);	
+				}
+				else {
+					aux = aux->next;
+				}
 
-			/*}*/
+			}
 		}
 	}
 
@@ -439,26 +443,55 @@ void main() {
 	f = fopen("tranzits.txt", "r");
 
 	//graf
-	/*inserareListaPrincipala(&cap, creareTransit(f));
-	inserareListaPrincipala(&cap, creareTransit(f));
-	inserareListaPrincipala(&cap, creareTransit(f));
-	inserareVecini(cap, 1, 2);
-	inserareVecini(cap, 1, 3);
-	afisareLista(cap);
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareListaPrincipala(&cap, creareTransit(f));
+	//inserareVecini(cap, 1, 4);
+	//inserareVecini(cap, 1, 5);
+	//inserareVecini(cap, 1, 7);
+	//inserareVecini(cap, 2, 4);
+	//inserareVecini(cap, 2, 7);
+	//inserareVecini(cap, 2, 11);
+	//inserareVecini(cap, 3, 2);
+	//inserareVecini(cap, 3, 12);
+	//inserareVecini(cap, 4, 1);
+	//inserareVecini(cap, 4, 2);
+	//inserareVecini(cap, 4, 12);
+	//inserareVecini(cap, 5, 1);
+	//inserareVecini(cap, 5, 4);
+	//inserareVecini(cap, 5, 12);
+	//inserareVecini(cap, 6, 7);
+	//inserareVecini(cap, 7, 4);
+	//inserareVecini(cap, 7, 3);
+	//inserareVecini(cap, 7, 10);
+	//inserareVecini(cap, 9, 10);
+	//inserareVecini(cap, 10, 11);
+	//inserareVecini(cap, 11, 1);
+	//inserareVecini(cap, 11, 3);
+	//inserareVecini(cap, 12, 11);
+	//inserareVecini(cap, 12, 1);
+	//afisareLista(cap);
 
-	a)
-	stergereID(&cap, 2);
-	printf("\n\ngraf dupa sterge nod\n\n");
-	afisareLista(cap);
+	////a)
+	//stergereID(&cap, 2);
+	//printf("\n\ngraf dupa sterge nod\n\n");
+	//afisareLista(cap);
 
 
-	b)
-	dezalocare(cap);
-	printf("\n\ngraf dupa dezalocare\n\n");
-	afisareLista(cap);*/
+	////b)
+	//dezalocare(cap);
+	//printf("\n\ngraf dupa dezalocare\n\n");
+	//afisareLista(cap);
 
 	//arbore binar
-	inserareArbore(&radacina, creareTransit(f));
+	/*inserareArbore(&radacina, creareTransit(f));
 	inserareArbore(&radacina, creareTransit(f));
 	inserareArbore(&radacina, creareTransit(f));
 	inserareArbore(&radacina, creareTransit(f));
@@ -473,17 +506,17 @@ void main() {
 	parcurgereInOrdine(radacina);
 	stergere2(&radacina, 1);
 	printf("\n\narborele dupa stergere\n\n");
-	parcurgereInOrdine(radacina);
+	parcurgereInOrdine(radacina);*/
 
 	//lista dubla
-	/*inserareListaD(&listad, creareTransit(f));
+	inserareListaD(&listad, creareTransit(f));
 	inserareListaD(&listad, creareTransit(f));
 	inserareListaD(&listad, creareTransit(f));
 
 	afisareLD(listad);
-	stergereNod(&listad, "Bakerloo line");
+	stergereNod(&listad, "Circle line");
 	printf("\n\n");
-	afisareLD(listad);*/
+	afisareLD(listad);
 
 
 
