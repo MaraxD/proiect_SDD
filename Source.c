@@ -416,7 +416,8 @@ void stergereNod(ListaD* cap, char* denumire) {
 					//aux->prev->next = aux->next;
 					free(aux->info.denumire);
 					free(aux->info.anDStatii);
-					free(aux);	
+					free(aux);
+					break;
 				}
 				else {
 					aux = aux->next;
@@ -514,7 +515,7 @@ void main() {
 	inserareListaD(&listad, creareTransit(f));
 
 	afisareLD(listad);
-	stergereNod(&listad, "Circle line");
+	stergereNod(&listad, "Central line");
 	printf("\n\n");
 	afisareLD(listad);
 
