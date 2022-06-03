@@ -182,31 +182,35 @@ void inserareVecini(NodPrincipal* nod, int id1, int id2) {
 	}
 }
 
+
+Tranzit creareDefault() {
+	Tranzit t;
+	t.id = NULL;
+	t.tip = -1;
+	t.lungime = 00.0;
+	t.nrMedCalatori = -1;
+	t.nrStatii = -1;
+	t.denumire = NULL;
+	t.anDStatii = -1;
+
+	return t;
+}
+
+//a)Stergerea si dezalocarea unui nod dupa id dintr - un graf; 
 void stergereID(NodPrincipal** nod, int id) {
-	//stergem legaturile vecinilor nodului pe care vrem sa l stergem
-	NodPrincipal* aux1 = (*nod);
-	NodSecundar* aux2 = (*nod)->vecini;
-	while (aux1) {
-		if (aux1->info.id == id) {
-			aux1->next = NULL;
-			//dar vreau sa sterg legatura si cu primul lui vecin
-			aux1->vecini->next = NULL;
+	NodPrincipal* aux = (*nod);
+	NodPrincipal* n = aux;
+	if (aux->info.id == id) {
+		aux = aux->next;
 
-		}
-		else {
-			//daca se afla printre vecini
-			while (aux2) {
-				if (aux2->info->info.id == id) {
-					aux2->next = NULL;
-				}
-				aux2 = aux2->next;
-			}
-		}
-
-		aux1 = aux1->next;
+		free(n->info.denumire);
+		free(n);
+		n = NULL;
 	}
-
-	free(cautareNod(nod, id));
+	else {
+		stergereID((*nod)->next, id);
+	}
+	(*nod) = aux;
 
 
 
@@ -241,30 +245,36 @@ void afisareLD(ListaD ld) {
 void stergereNod(ListaD* cap, char* denumire) {
 	Nod* aux = cap->prim;
 	Nod* aux2 = cap->ultim;
-	if (strcmp(aux->info.denumire, denumire)) { //daca intra inseamna ca exista si primul cap/ultimul cap
-		aux = aux->next;
-		aux->prev = NULL;
-		free(aux);
-	}
-	else if (strcmp(aux2->info.denumire, denumire)) {
-		aux2 = aux2->prev;
-		aux2->next = NULL;
-		free(aux2);
-	}
-	else {
-		while (aux->next) {
-			if (strcmp(aux->info.denumire, denumire)) {
-				aux = aux->next;
-				aux->prev = aux->prev->prev;
-				free(aux);
-			}
-			else {
-				aux = aux->next;
-			}
+	if (cap->prim || cap->ultim) {
+		if (strcmp(cap->prim->info.denumire, denumire)==0) { //daca intra inseamna ca exista si primul cap/ultimul cap
+			cap->prim = aux->next; //urmatorul nod de dupa nodul sters va deveni noul cap
+			free(aux->info.denumire); //stergi capul (unde se afla elem cautat)
+			free(aux);
+		}
+		//daca se afla la sfarsit
+		else if (strcmp(cap->ultim->info.denumire, denumire)==0) {
+			cap->ultim = aux2->prev;
+			free(aux2->info.denumire); //stergi capul (unde se afla elem cautat)
+			free(aux2);
+		}
+		//daca se afla in interior (fac parcurgere de la stg la dr)
+		else {
+			aux = aux->next;
+			/*while (aux->next) {*/
+				if (strcmp(aux->info.denumire, denumire)==0) {
+					aux->prev->next = aux->next;
+					free(aux->info.denumire);
+					free(aux);
+				}/*
+				else {
+					aux = aux->next;
+				}*/
 
+			/*}*/
 		}
 	}
-	
+
+
 }
 
 
@@ -282,6 +292,12 @@ void main() {
 	//arbore
 	/*inserareListaPrincipala(&cap, creareTransit(f));
 	inserareListaPrincipala(&cap, creareTransit(f));
+	inserareListaPrincipala(&cap, creareTransit(f));
+	inserareVecini(cap, 1, 2);
+	inserareVecini(cap, 1, 3);
+	afisareLista(cap);
+	stergereID(&cap, 2);
+	printf("\n\ngraf dupa sterge nod\n\n");
 	afisareLista(cap);*/
 
 	//lista dubla
@@ -290,7 +306,7 @@ void main() {
 	inserareListaD(&listad, creareTransit(f));
 
 	afisareLD(listad);
-	stergereNod(&listad, "Jubilee line");
+	stergereNod(&listad, "Bakerloo line");
 	printf("\n\n");
 	afisareLD(listad);
 
