@@ -55,8 +55,8 @@ struct Nod {
 
 struct NodA {
 	Tranzit info;
-	Nod* dreapta;
-	Nod* stanga;
+	NodA* dreapta;
+	NodA* stanga;
 };
 
 struct ListaD {
@@ -311,13 +311,55 @@ int nrCopii(NodA* rad) {
 //daca nodul are un copil, acesta este inlocuit de copil
 //daca nodul are doi copii, acesta este inlocuit de copilul cu valoarea cea mai mare (compari id urile)
 //nr de copii este dat de diferenta de inaltime
-void stergereInArbore(NodA** ndr, int id) {
-	if ((*ndr)->dreapta && (*ndr)->dreapta->info.id==id) {
-		stergereInArbore((*ndr)->dreapta, id);
+//functia in caz ca nodul pe care vrem sa l stergem are doi copii/subarbori
+void stergere1(NodA** ndr, NodA**nodS) {
+	if ((*ndr)->stanga) {
+		stergere1(&(*ndr)->stanga, &(*nodS));
 	}
 	else {
+		(*nodS)->info = (*ndr)->info;
+		NodA* aux = (*ndr);
+		(*ndr) = (*ndr)->stanga;
+		free(aux);
+	}
+}
 
-
+void stergere2(NodA** nod, int id) {
+	if (*nod) {
+		if ((*nod)->info.id == id) {
+			//nodul trebuie sters
+			if ((*nod)->stanga == NULL && (*nod)->dreapta) {
+				free(*nod);
+				(*nod) = NULL;
+			}
+			else {
+				if ((*nod)->dreapta == NULL) {
+					NodA* aux = *nod;
+					(*nod) = (*nod)->stanga;
+					free(aux);
+				}
+				else {
+					if ((*nod)->stanga == NULL) {
+						NodA* aux = *nod;
+						(*nod) = (*nod)->dreapta;
+						free(aux);
+					}
+					else {
+						stergere1((*nod)->stanga, (*nod));
+					}
+				}
+			}
+		}
+		else {
+			if ((*nod)->info.id > id)
+				stergere2(&(*nod)->stanga, id);
+			else
+				stergere2(&(*nod)->dreapta, id);
+		}
+	}
+	else
+	{
+		return "valoarea nu se afla in arbore";
 	}
 }
 
@@ -391,28 +433,47 @@ void main() {
 	ListaD listad;
 	listad.prim = NULL;
 	listad.ultim = NULL;
+	NodA* radacina = NULL;
 
 	FILE* f = NULL;
 	f = fopen("tranzits.txt", "r");
 
-	//arbore
-	inserareListaPrincipala(&cap, creareTransit(f));
+	//graf
+	/*inserareListaPrincipala(&cap, creareTransit(f));
 	inserareListaPrincipala(&cap, creareTransit(f));
 	inserareListaPrincipala(&cap, creareTransit(f));
 	inserareVecini(cap, 1, 2);
 	inserareVecini(cap, 1, 3);
 	afisareLista(cap);
 
-	//a)
-	/*stergereID(&cap, 2);
+	a)
+	stergereID(&cap, 2);
 	printf("\n\ngraf dupa sterge nod\n\n");
-	afisareLista(cap);*/
+	afisareLista(cap);
 
 
-	//b)
+	b)
 	dezalocare(cap);
 	printf("\n\ngraf dupa dezalocare\n\n");
-	afisareLista(cap);
+	afisareLista(cap);*/
+
+	//arbore binar
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+	inserareArbore(&radacina, creareTransit(f));
+
+	parcurgereInOrdine(radacina);
+	stergere2(&radacina, 1);
+	printf("\n\narborele dupa stergere\n\n");
+	parcurgereInOrdine(radacina);
 
 	//lista dubla
 	/*inserareListaD(&listad, creareTransit(f));
