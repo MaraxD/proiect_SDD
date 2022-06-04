@@ -207,6 +207,7 @@ Tranzit creareDefault() {
 void stergereID(NodPrincipal** nod, int id) {
 	if ((*nod)->info.id == id) {
 		NodPrincipal* aux = (*nod);
+		(*nod)->vecini = NULL;
 		(*nod) = (*nod)->next;
 		free(aux->info.denumire);
 		free(aux->info.anDStatii);
@@ -218,37 +219,30 @@ void stergereID(NodPrincipal** nod, int id) {
 }
 
 //b)Stergerea si dezalocarea grafului(toate nodurile);
-void dezalocare(NodPrincipal* cap) {
-	while (cap) { //daca am un cap in lista principala inseamna ca am 0 sau mai multi vecini
-		while (cap->vecini) { //verific daca am un urmator, pentru ca atunci ar trebui sa ma mut pe urm poz inainte sa dezaloc
-			free(cap->vecini->info.denumire);
-			free(cap->vecini->info.anDStatii);
-			NodSecundar* aux1 = cap->vecini;
-			cap->vecini = cap->vecini->next;
-			free(aux1);
-		}
-		free(cap->info.denumire);
-		NodPrincipal* aux2 = cap;
-		cap = cap->next;//ma duc pe urm nod din lista principala si dupa dezaloc
-		free(aux2);
+dezalocareLS(NodSecundar** ns) {
+	while (*ns) {
+		free((*ns)->info->info.denumire);
+		free((*ns)->info->info.anDStatii);
+		NodSecundar* aux = *ns;
+		(*ns) = (*ns)->next;
+		free(aux);
 	}
-
-	//cap = NULL;
 }
 
-//void dezalocareLP(NodPrincipal** cap) {
-//	NodPrincipal* aux = (*cap);
-//	while (aux->next) {
-//		NodPrincipal* aux2 = aux->next;
-//		if (aux->vecini)
-//			dezalocareLS(aux->vecini);
-//		//printf("\nAm sters %s", aux->info.denumire);
-//		free(aux->info.denumire);
-//		free(aux);
-//		aux = aux2;
-//	}
-//	(*cap) = NULL;
-//}
+void dezalocareLP(NodPrincipal** np) {
+	while (*np) {
+		//daca nodul principal are vecini, apeleaza functia de mai sus
+		if ((*np)->vecini) {
+			dezalocareLS(&(*np)->vecini);
+		}
+		//acm stergem si nodul din lista principala
+		free((*np)->info.denumire);
+		free((*np)->info.anDStatii);
+		NodSecundar* aux = *np;
+		(*np) = (*np)->next;
+		free(aux);
+	}
+}
 
 
 
@@ -457,23 +451,24 @@ void main() {
 	inserareListaPrincipala(&cap, creareTransit(f2));
 	inserareListaPrincipala(&cap, creareTransit(f2));
 	inserareListaPrincipala(&cap, creareTransit(f2));
-	inserareVecini(cap, 2, 4);
+	inserareVecini(cap, 2, 7);
 	inserareVecini(cap, 3, 6);
 	inserareVecini(cap, 3, 5);
-	inserareVecini(cap, 4, 3);
-	inserareVecini(cap, 4, 5);
+	inserareVecini(cap, 4, 10);
+	inserareVecini(cap, 4, 11);
 	afisareLista(cap);
 
 	//a)
-	stergereID(&cap, 2);
+	/*stergereID(&cap, 2);
 	printf("\n\ngraf dupa sterge nod\n\n");
-	afisareLista(cap);
+	afisareLista(cap);*/
 
 
 	////b)
-	//dezalocare(cap);
-	//printf("\n\ngraf dupa dezalocare\n\n");
-	//afisareLista(cap);
+	printf("\n\ngraf dupa dezalocare\n\n");
+	dezalocareLP(&cap);
+	
+	afisareLista(cap);
 
 	//arbore binar
 	/*inserareArbore(&radacina, creareTransit(f));
