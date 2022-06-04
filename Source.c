@@ -93,7 +93,7 @@ Tranzit creareTransit(FILE* file)
 		strcpy(t.denumire, sir);
 
 		fgets(aux, 10, file);
-		t.nrMedCalatori = atol(aux); //la long??
+		t.nrMedCalatori = atol(aux); 
 
 		return t;
 	}
@@ -152,7 +152,7 @@ const char* getStatieNume(enum TIP tip) {
 
 
 void afisareTranzit(Tranzit t) {
-	printf("id nod: %d\ntipul de linie: %s\nlungime: %.2f km\nnumele statiei: %s\nnumar mediu de calatori pe saptamana: %d\nnumar de statii: %d\nanii in care a fost inaugurata fiecare statie: ",
+	printf("id nod: %d\ntipul de linie: %s\nlungime: %.2f km\nnumele statiei: %s\nnumar mediu de calatori pe saptamana: %d\nnumar de statii: %d\nanii in care a fost inaugurata fiecare statie: \n",
 		t.id, getStatieNume(t.tip), t.lungime, t.denumire, t.nrMedCalatori, t.nrStatii);
 	for (int i = 0; i < t.nrStatii; i++) {
 		printf("%d ", t.anDStatii[i]);
@@ -164,12 +164,12 @@ void afisareLista(NodPrincipal* np) {
 	while (np) {
 		afisareTranzit(np->info);
 		NodSecundar* aux = np->vecini;
-		printf("\n\nvecini:\n");
+		printf("\nvecini lui %d: \n", np->info.id);
 		while (aux) {
 			afisareTranzit(aux->info->info);
 			aux = aux->next;
 		}
-		printf("\n");
+		printf("\n\n");
 		np = np->next;
 	}
 }
@@ -205,12 +205,12 @@ Tranzit creareDefault() {
 
 //a)Stergerea si dezalocarea unui nod dupa id dintr - un graf; 
 void stergereID(NodPrincipal** nod, int id) {
-	NodPrincipal* aux = (*nod);
-	NodPrincipal* n = aux;
 	if ((*nod)->info.id == id) {
+		NodPrincipal* aux = (*nod);
 		(*nod) = (*nod)->next;
-		free(n->info.denumire);
-		free(n);
+		free(aux->info.denumire);
+		free(aux->info.anDStatii);
+		free(aux);
 	}
 	else {
 		stergereID(&(*nod)->next, id);
@@ -442,48 +442,32 @@ void main() {
 
 	FILE* f = NULL;
 	f = fopen("tranzits.txt", "r");
+	
 
 	//graf
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareListaPrincipala(&cap, creareTransit(f));
-	//inserareVecini(cap, 1, 4);
-	//inserareVecini(cap, 1, 5);
-	//inserareVecini(cap, 1, 7);
-	//inserareVecini(cap, 2, 4);
-	//inserareVecini(cap, 2, 7);
-	//inserareVecini(cap, 2, 11);
-	//inserareVecini(cap, 3, 2);
-	//inserareVecini(cap, 3, 12);
-	//inserareVecini(cap, 4, 1);
-	//inserareVecini(cap, 4, 2);
-	//inserareVecini(cap, 4, 12);
-	//inserareVecini(cap, 5, 1);
-	//inserareVecini(cap, 5, 4);
-	//inserareVecini(cap, 5, 12);
-	//inserareVecini(cap, 6, 7);
-	//inserareVecini(cap, 7, 4);
-	//inserareVecini(cap, 7, 3);
-	//inserareVecini(cap, 7, 10);
-	//inserareVecini(cap, 9, 10);
-	//inserareVecini(cap, 10, 11);
-	//inserareVecini(cap, 11, 1);
-	//inserareVecini(cap, 11, 3);
-	//inserareVecini(cap, 12, 11);
-	//inserareVecini(cap, 12, 1);
-	//afisareLista(cap);
+	FILE* f2 = NULL;
+	f2 = fopen("tranzits2.txt", "r");
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareListaPrincipala(&cap, creareTransit(f2));
+	inserareVecini(cap, 2, 4);
+	inserareVecini(cap, 3, 6);
+	inserareVecini(cap, 3, 5);
+	inserareVecini(cap, 4, 3);
+	inserareVecini(cap, 4, 5);
+	afisareLista(cap);
 
-	////a)
-	//stergereID(&cap, 2);
-	//printf("\n\ngraf dupa sterge nod\n\n");
-	//afisareLista(cap);
+	//a)
+	stergereID(&cap, 2);
+	printf("\n\ngraf dupa sterge nod\n\n");
+	afisareLista(cap);
 
 
 	////b)
@@ -510,14 +494,14 @@ void main() {
 	parcurgereInOrdine(radacina);*/
 
 	//lista dubla
-	inserareListaD(&listad, creareTransit(f));
+	/*inserareListaD(&listad, creareTransit(f));
 	inserareListaD(&listad, creareTransit(f));
 	inserareListaD(&listad, creareTransit(f));
 
 	afisareLD(listad);
 	stergereNod(&listad, "Central line");
 	printf("\n\n");
-	afisareLD(listad);
+	afisareLD(listad);*/
 
 
 
