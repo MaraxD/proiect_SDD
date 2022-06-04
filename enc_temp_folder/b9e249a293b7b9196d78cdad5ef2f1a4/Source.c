@@ -389,12 +389,16 @@ void stergereNod(ListaD* cap, char* denumire) {
 }
 
 
+
+
 void main() {
 	NodPrincipal* cap = NULL;
 	ListaD listad;
 	listad.prim = NULL;
 	listad.ultim = NULL;
 	NodA* radacina = NULL;
+
+	
 
 
 	//graf
