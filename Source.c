@@ -4,15 +4,6 @@
 #include<stdlib.h> //pt atof
 #include<string.h>
 
-//Sa se defineasca propria structura(alta decat cele utilizate la seminar) care sa contina :
-// 
-//Pornind de la exemplele de la seminar sa se defineasca si sa se testeze urmatoarele functii :
-//a)Stergerea si dezalocarea unui nod dupa id dintr - un graf; 
-//b)Stergerea si dezalocarea grafului(toate nodurile);
-//c)Stergerea unui nod din arbore dupa id;
-//d)Stergere nod dupa un camp de tip char* dintr - o lista dubla;
-//e)Sa se citeasca din fisier cel putin 8 elemente de tip struct (pe care l - ati ales) DONE
-
 
 //liniile de metrou din Anglia 
 typedef struct Tranzit Tranzit;
@@ -32,7 +23,7 @@ struct Tranzit {
 	float lungime;
 	int nrStatii; //dim vectorului de mai jos
 	int* anDStatii; //anii in care s a deschis fiecare statie
-	char* denumire; //culoarea pe care o are pe harta
+	char* denumire; //numele statie
 	long nrMedCalatori; //nr mediu de calatori de sapt
 };
 
@@ -64,6 +55,20 @@ struct ListaD {
 	Nod* prim;
 };
 
+const char* getStatieNume(enum TIP tip) {
+	switch (tip)
+	{
+	case DT:
+		return "Deep tube";
+		break;
+	case SS:
+		return "Sub surface";
+		break;
+	default:
+		break;
+	}
+
+}
 Tranzit creareTransit(FILE* file)
 {
 
@@ -135,20 +140,7 @@ void inserareListaSecundara(NodSecundar** cap, NodPrincipal* infoT) {
 	}
 }
 
-const char* getStatieNume(enum TIP tip) {
-	switch (tip)
-	{
-	case DT:
-		return "Deep tube";
-		break;
-	case SS:
-		return "Sub surface";
-		break;
-	default:
-		break;
-	}
 
-}
 
 
 void afisareTranzit(Tranzit t) {
@@ -422,6 +414,8 @@ void main() {
 
 	afisareLista(cap);
 
+
+
 	//arbore binar
 	FILE* f = NULL;
 	f = fopen("tranzits.txt", "r");
@@ -433,6 +427,8 @@ void main() {
 	stergere2(&radacina, 1);
 	printf("\n\narborele dupa stergere\n\n");
 	parcurgereInOrdine(radacina);*/
+
+
 
 	//lista dubla
 	/*inserareListaD(&listad, creareTransit(f));
